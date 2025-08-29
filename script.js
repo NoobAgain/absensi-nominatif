@@ -219,13 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
         Object.keys(groupedByProdi).forEach(prodi => {
-            let prodiTotals = { hadir: 0, dd: 0, sakit: 0, izin: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
+            let prodiTotals = { hadir: 0 };
             const prodiPersonnel = groupedByProdi[prodi];
             
             prodiPersonnel.forEach(person => {
                 const originalIndex = personnelData.findIndex(p => p.nama === person.nama);
                 const status = document.querySelector(`.status-select[data-index="${originalIndex}"]`).value;
-                if(prodiTotals[status] !== undefined) prodiTotals[status]++;
+                if(status === 'hadir') prodiTotals.hadir++;
             });
             
             const prodiSummaryContainer = document.getElementById(`summary-${prodi}`);
@@ -281,43 +281,81 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllSummaries();
     }
     
-    // --- Fungsi Ekspor ---
+    // --- FUNGSI EKSPOR YANG DIPERBARUI ---
     function exportToExcel() {
-        let totals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
+        let csvContent = "data:text/csv;charset=utf-8,";
+        const sessionTitle = `REKAPITULASI ${SESSIONS[activeSession].toUpperCase()} - ${datePicker.value}\r\n\r\n`;
+
+        // 1. Hitung dan tambahkan Rekapitulasi Keseluruhan di awal
+        let grandTotals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
         for (let i = 0; i < personnelData.length; i++) {
             const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
-            if (totals[status] !== undefined) totals[status]++;
+            if (grandTotals[status] !== undefined) grandTotals[status]++;
         }
-        const kurang = personnelData.length - totals.hadir;
+        const grandKurang = personnelData.length - grandTotals.hadir;
 
-        let summaryCsv = `REKAPITULASI ${SESSIONS[activeSession].toUpperCase()} - ${datePicker.value}\r\n\r\n`;
+        let summaryCsv = "REKAPITULASI KESELURUHAN\r\n";
         summaryCsv += `Jumlah,"${personnelData.length}"\r\n`;
-        summaryCsv += `Hadir,"${totals.hadir}"\r\n`;
-        summaryCsv += `Kurang,"${kurang}"\r\n`;
-        summaryCsv += `DD,"${totals.dd}"\r\n`;
-        summaryCsv += `Sakit,"${totals.sakit}"\r\n`;
-        summaryCsv += `Izin,"${totals.izin}"\r\n`;
-        summaryCsv += `Piket Rusun,"${totals.piketRusun}"\r\n`;
-        summaryCsv += `Piket Kelas,"${totals.piketKelas}"\r\n`;
-        summaryCsv += `Lokananta,"${totals.lokananta}"\r\n\r\n\r\n`;
-
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += summaryCsv;
-        csvContent += "No,Nama,Prodi,Status,Keterangan\r\n";
+        summaryCsv += `Hadir,"${grandTotals.hadir}"\r\n`;
+        summaryCsv += `Kurang,"${grandKurang}"\r\n`;
+        summaryCsv += `DD,"${grandTotals.dd}"\r\n`;
+        summaryCsv += `Sakit,"${grandTotals.sakit}"\r\n`;
+        summaryCsv += `Izin,"${grandTotals.izin}"\r\n`;
+        summaryCsv += `Piket Rusun,"${grandTotals.piketRusun}"\r\n`;
+        summaryCsv += `Piket Kelas,"${grandTotals.piketKelas}"\r\n`;
+        summaryCsv += `Lokananta,"${grandTotals.lokananta}"\r\n\r\n`;
+        summaryCsv += "----------------------------------------\r\n\r\n";
         
-        personnelData.forEach((person, index) => {
-            const statusSelect = document.querySelector(`.status-select[data-index="${index}"]`);
-            const status = statusSelect.options[statusSelect.selectedIndex].text; // Ambil teks status
-            let keterangan = document.querySelector(`.keterangan-input[data-index="${index}"]`).value.replace(/"/g, '""');
-            if (keterangan.includes(",")) keterangan = `"${keterangan}"`;
-            csvContent += `${index + 1},${person.nama},${person.prodi},${status},${keterangan}\r\n`;
-        });
+        csvContent += sessionTitle + summaryCsv;
 
+        // 2. Kelompokkan data per prodi
+        const groupedByProdi = personnelData.reduce((acc, person) => {
+            (acc[person.prodi] = acc[person.prodi] || []).push(person);
+            return acc;
+        }, {});
+
+        // 3. Buat tabel dan rekap untuk setiap prodi
+        Object.keys(groupedByProdi).forEach(prodi => {
+            const prodiPersonnel = groupedByProdi[prodi];
+            
+            csvContent += `PRODI: ${prodi.toUpperCase()}\r\n`;
+            
+            // Hitung rekap prodi
+            let prodiTotals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
+            prodiPersonnel.forEach(person => {
+                const originalIndex = personnelData.findIndex(p => p.nama === person.nama);
+                const status = document.querySelector(`.status-select[data-index="${originalIndex}"]`).value;
+                if (prodiTotals[status] !== undefined) prodiTotals[status]++;
+            });
+            const prodiKurang = prodiPersonnel.length - prodiTotals.hadir;
+
+            csvContent += `Jumlah,"${prodiPersonnel.length}",Hadir,"${prodiTotals.hadir}",Kurang,"${prodiKurang}"\r\n`;
+            csvContent += `DD,"${prodiTotals.dd}",Sakit,"${prodiTotals.sakit}",Izin,"${prodiTotals.izin}"\r\n`;
+            csvContent += `Piket Rusun,"${prodiTotals.piketRusun}",Piket Kelas,"${prodiTotals.piketKelas}",Lokananta,"${prodiTotals.lokananta}"\r\n\r\n`;
+            
+            // Header tabel prodi
+            csvContent += "No,Nama,Status,Keterangan\r\n";
+
+            // Data personel prodi
+            prodiPersonnel.forEach((person, personIndex) => {
+                const originalIndex = personnelData.findIndex(p => p.nama === person.nama);
+                const statusSelect = document.querySelector(`.status-select[data-index="${originalIndex}"]`);
+                const statusText = statusSelect.options[statusSelect.selectedIndex].text;
+                let keterangan = document.querySelector(`.keterangan-input[data-index="${originalIndex}"]`).value.replace(/"/g, '""');
+                if (keterangan.includes(",")) keterangan = `"${keterangan}"`;
+                
+                csvContent += `${personIndex + 1},"${person.nama}","${statusText}","${keterangan}"\r\n`;
+            });
+
+            csvContent += "\r\n----------------------------------------\r\n\r\n";
+        });
+        
+        // 4. Buat dan unduh file
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         const sessionName = SESSIONS[activeSession].replace(/\s+/g, '-');
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `Rekap-${sessionName}-${datePicker.value}.csv`);
+        link.setAttribute("download", `Laporan-Absensi-${sessionName}-${datePicker.value}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
