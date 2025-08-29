@@ -58,7 +58,7 @@ input[type="text"], input[type="password"], input[type="date"], select {
     border: 1px solid var(--border-color);
     background-color: var(--background-color);
     color: var(--text-primary);
-    border-radius: 8px; /* Sudut lebih tajam untuk input */
+    border-radius: 8px;
     box-sizing: border-box;
     font-size: 1rem;
     transition: all 0.2s;
@@ -111,7 +111,6 @@ input:focus, select:focus {
 .header h1 { font-size: 1.75rem; margin: 0; }
 .clock { color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem; }
 
-/* --- PENATAAN ULANG KONTROL --- */
 .controls {
     max-width: none;
     margin-bottom: 1.5rem;
@@ -123,7 +122,7 @@ input:focus, select:focus {
     padding: 1.5rem;
 }
 .date-picker-group { flex: 1 1 250px; min-width: 200px; }
-.button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; /* Jarak antar tombol */ }
+.button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 
 .error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; height: 1.25rem; }
 .notification {
