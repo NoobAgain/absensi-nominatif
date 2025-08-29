@@ -276,13 +276,44 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Fungsi Ekspor ---
     function exportToExcel() {
-        let csvContent = "data:text/csv;charset=utf-8,No,Nama,Prodi,Status,Keterangan\r\n";
+        // 1. Kalkulasi nilai rekapitulasi
+        let totals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
+        for (let i = 0; i < personnelData.length; i++) {
+            const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
+            if (totals[status] !== undefined) totals[status]++;
+            
+            const keterangan = document.querySelector(`.keterangan-input[data-index="${i}"]`).value.toLowerCase();
+            if (keterangan.includes('piket rusun')) totals.piketRusun++;
+            if (keterangan.includes('piket kelas')) totals.piketKelas++;
+            if (keterangan.includes('lokananta')) totals.lokananta++;
+        }
+        const kurang = personnelData.length - totals.hadir;
+
+        // 2. Buat string rekapitulasi untuk CSV
+        let summaryCsv = `REKAPITULASI ${SESSIONS[activeSession].toUpperCase()} - ${datePicker.value}\r\n\r\n`;
+        summaryCsv += `Jumlah,"${personnelData.length}"\r\n`;
+        summaryCsv += `Hadir,"${totals.hadir}"\r\n`;
+        summaryCsv += `Kurang,"${kurang}"\r\n`;
+        summaryCsv += `DD,"${totals.dd}"\r\n`;
+        summaryCsv += `Sakit,"${totals.sakit}"\r\n`;
+        summaryCsv += `Izin,"${totals.izin}"\r\n\r\n`;
+        summaryCsv += `Piket Rusun,"${totals.piketRusun}"\r\n`;
+        summaryCsv += `Piket Kelas,"${totals.piketKelas}"\r\n`;
+        summaryCsv += `Lokananta,"${totals.lokananta}"\r\n\r\n\r\n`;
+
+        // 3. Gabungkan rekapitulasi dengan data tabel
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += summaryCsv;
+        csvContent += "No,Nama,Prodi,Status,Keterangan\r\n";
+        
         personnelData.forEach((person, index) => {
             const status = document.querySelector(`.status-select[data-index="${index}"]`).value.toUpperCase();
             let keterangan = document.querySelector(`.keterangan-input[data-index="${index}"]`).value.replace(/"/g, '""');
             if (keterangan.includes(",")) keterangan = `"${keterangan}"`;
             csvContent += `${index + 1},${person.nama},${person.prodi},${status},${keterangan}\r\n`;
         });
+
+        // 4. Buat dan picu link unduhan
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         const sessionName = SESSIONS[activeSession].replace(/\s+/g, '-');
