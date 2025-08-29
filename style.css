@@ -10,6 +10,7 @@
     --text-secondary: #a1a1aa;
     --font-family: 'Inter', sans-serif;
     --border-radius: 12px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 body {
@@ -36,6 +37,7 @@ body {
     width: 100%;
     max-width: 400px;
     box-sizing: border-box;
+    box-shadow: var(--shadow);
 }
 
 #app-container {
@@ -56,7 +58,7 @@ input[type="text"], input[type="password"], input[type="date"], select {
     border: 1px solid var(--border-color);
     background-color: var(--background-color);
     color: var(--text-primary);
-    border-radius: var(--border-radius);
+    border-radius: 8px; /* Sudut lebih tajam untuk input */
     box-sizing: border-box;
     font-size: 1rem;
     transition: all 0.2s;
@@ -75,12 +77,16 @@ input:focus, select:focus {
     gap: 0.5rem;
     padding: 0.75rem 1.25rem;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
     transition: all 0.2s;
     white-space: nowrap;
+    box-shadow: var(--shadow);
+}
+.btn:hover {
+    transform: translateY(-2px);
 }
 .icon { width: 1.125rem; height: 1.125rem; }
 
@@ -98,7 +104,7 @@ input:focus, select:focus {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -108,15 +114,16 @@ input:focus, select:focus {
 /* --- PENATAAN ULANG KONTROL --- */
 .controls {
     max-width: none;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     align-items: flex-end;
     justify-content: space-between;
+    padding: 1.5rem;
 }
-.date-picker-group { flex: 1 1 250px; }
-.button-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.date-picker-group { flex: 1 1 250px; min-width: 200px; }
+.button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; /* Jarak antar tombol */ }
 
 .error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; height: 1.25rem; }
 .notification {
@@ -126,6 +133,7 @@ input:focus, select:focus {
     border-radius: var(--border-radius);
     text-align: center;
     margin-bottom: 1rem;
+    box-shadow: var(--shadow);
 }
 
 .session-tabs-nav {
@@ -133,8 +141,9 @@ input:focus, select:focus {
     background-color: var(--card-background);
     border-radius: var(--border-radius);
     padding: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     overflow-x: auto;
+    box-shadow: var(--shadow);
 }
 .session-tab-link {
     flex: 1;
@@ -151,16 +160,16 @@ input:focus, select:focus {
 }
 .session-tab-link.active { background-color: var(--primary-color); color: white; }
 
-.summary-card { max-width: none; margin-bottom: 1rem; }
+.summary-card { max-width: none; margin-bottom: 1.5rem; }
 .summary-card h4 { margin-top: 0; text-align: center; color: var(--text-secondary); font-weight: 500;}
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 1rem; }
-.summary-item { text-align: center; background: var(--background-color); padding: 1rem; border-radius: var(--border-radius);}
+.summary-item { text-align: center; background: var(--background-color); padding: 1rem; border-radius: 8px;}
 .summary-item span { font-size: 0.875rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem; }
 .summary-item strong { font-size: 1.5rem; color: var(--text-primary); }
 .summary-card hr { border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0; }
 .global-summary .summary-item strong { color: var(--primary-color); }
 
-.tabs-nav { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; overflow-x: auto; }
+.tabs-nav { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; overflow-x: auto; }
 .tab-link {
     padding: 1rem 1.5rem;
     cursor: pointer;
@@ -178,30 +187,27 @@ input:focus, select:focus {
 .tab-pane.active { display: block; animation: fadeIn 0.5s; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- PENYESUAIAN RESPONSIVE UNTUK TABEL (DESKTOP FIRST) --- */
-.table-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-x: auto; }
+.table-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-x: auto; box-shadow: var(--shadow); }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
 thead th { background-color: #3f3f46; font-weight: 600; white-space: nowrap; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background-color: #3f3f46; }
 
-.prodi-summary { margin-top: 1rem; padding: 1rem; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); }
+.prodi-summary { margin-top: 1.5rem; padding: 1.5rem; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--shadow); }
 .prodi-summary h4 { margin-top: 0; color: var(--text-secondary); font-weight: 500; }
 .prodi-summary .summary-item { background: transparent; padding: 0; }
 
-/* --- TATA LETAK MOBILE (BREAKPOINT 768px) --- */
 @media (max-width: 768px) {
     body { padding: 0.5rem; }
     .header h1 { font-size: 1.5rem; }
-    .btn-text { display: none; } /* Sembunyikan teks di tombol utama */
+    .btn-text { display: none; }
     .btn { padding: 0.75rem; }
     
     .summary-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.5rem; }
     .summary-item strong { font-size: 1.25rem; }
     .tab-link { padding: 0.75rem 1rem; }
     
-    /* --- LOGIKA TABEL RESPONSIVE BARU --- */
     thead { display: none; }
     table, tbody, tr, td { display: block; width: 100%; }
     
@@ -211,26 +217,15 @@ tbody tr:hover { background-color: #3f3f46; }
         border-radius: var(--border-radius);
         padding: 1rem;
         box-sizing: border-box;
+        background-color: var(--card-background);
+        box-shadow: var(--shadow);
     }
     
-    td {
-        padding: 0;
-        display: block;
-        text-align: left;
-        border-bottom: none;
-    }
+    td { padding: 0; display: block; text-align: left; border-bottom: none; }
     
-    td[data-label="Nama"] { 
-        font-weight: 600; 
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
+    td[data-label="Nama"] { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; }
+    td[data-label="Status"], td[data-label="Keterangan"] { padding-top: 0.5rem; }
 
-    td[data-label="Status"], td[data-label="Keterangan"] {
-        padding-top: 0.5rem;
-    }
-
-    /* Tampilkan label di atas input untuk mobile */
     td:before {
         content: attr(data-label);
         font-weight: 500;
@@ -240,11 +235,13 @@ tbody tr:hover { background-color: #3f3f46; }
         font-size: 0.875rem;
     }
     
-    td[data-label="Nama"]:before, td[data-label="No"]:before { 
-        display: none; 
-    }
-    td[data-label="No"] { 
-        display: none; 
-    }
+    td[data-label="Nama"]:before, td[data-label="No"]:before { display: none; }
+    td[data-label="No"] { display: none; }
+}
+
+@media (max-width: 480px) {
+    .controls { flex-direction: column; align-items: stretch; }
+    .button-group { justify-content: space-between; }
+    .button-group .btn { flex-grow: 1; }
 }
 
