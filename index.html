@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Nominatif TK3</title>
+    <title>Absensi Nominatif Modern</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,9 +30,13 @@
 
     <div id="app-container" style="display: none;">
         <div class="header">
-            <h1>Absensi Nominatif TK3</h1>
+            <div>
+                <h1>Absensi Nominatif</h1>
+                <div id="clock" class="clock"></div>
+            </div>
             <button id="logout-button" class="btn btn-danger">
-                <i data-feather="log-out" class="icon"></i> Logout
+                <i data-feather="log-out" class="icon"></i>
+                <span class="btn-text">Logout</span>
             </button>
         </div>
         <div class="controls card">
@@ -41,22 +45,28 @@
                 <input type="date" id="date-picker">
             </div>
             <div class="button-group">
-                <button id="save-button" class="btn btn-primary"><i data-feather="save" class="icon"></i> Simpan</button>
-                <button id="reset-button" class="btn btn-secondary"><i data-feather="refresh-cw" class="icon"></i> Reset</button>
+                <button id="export-button" class="btn btn-success"><i data-feather="download" class="icon"></i><span class="btn-text">Ekspor</span></button>
+                <button id="save-button" class="btn btn-primary"><i data-feather="save" class="icon"></i><span class="btn-text">Simpan</span></button>
+                <button id="reset-button" class="btn btn-secondary"><i data-feather="refresh-cw" class="icon"></i><span class="btn-text">Reset</span></button>
             </div>
         </div>
         <p id="save-notification" class="notification" style="display: none;"></p>
         
-        <div id="summary-container" class="card summary-card">
-            <!-- Konten rekapitulasi KESELURUHAN akan diisi oleh JavaScript -->
-        </div>
+        <!-- NAVIGASI UTAMA BARU UNTUK APEL -->
+        <div id="session-tabs-nav" class="session-tabs-nav"></div>
 
-        <div class="tabs-container">
-            <div id="tabs-nav" class="tabs-nav">
-                <!-- Navigasi Tab akan diisi oleh JavaScript -->
+        <div id="main-content">
+            <div id="summary-container" class="card summary-card">
+                <!-- Konten rekapitulasi KESELURUHAN akan diisi oleh JavaScript -->
             </div>
-            <div id="tabs-content">
-                <!-- Konten Tab (Tabel & Rekap per Prodi) akan diisi oleh JavaScript -->
+
+            <div class="tabs-container">
+                <div id="prodi-tabs-nav" class="tabs-nav">
+                    <!-- Navigasi Tab Prodi akan diisi oleh JavaScript -->
+                </div>
+                <div id="prodi-tabs-content">
+                    <!-- Konten Tab (Tabel & Rekap per Prodi) akan diisi oleh JavaScript -->
+                </div>
             </div>
         </div>
     </div>
@@ -64,7 +74,6 @@
     <script src="data.js"></script>
     <script src="script.js"></script>
     <script>
-      // Inisialisasi Feather Icons setelah elemen dimuat
     document.addEventListener('DOMContentLoaded', () => {
         feather.replace();
     });
