@@ -34,6 +34,7 @@ body {
     border: 1px solid var(--border-color);
     width: 100%;
     max-width: 400px;
+    box-sizing: border-box;
 }
 
 #app-container {
@@ -42,26 +43,11 @@ body {
     margin: auto;
 }
 
-.card-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    text-align: center;
-}
-.card-subtitle {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
+.card-title { font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem 0; text-align: center; }
+.card-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center; }
 
 .input-group { margin-bottom: 1rem; }
-.input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
 
 input[type="text"], input[type="password"], input[type="date"], select {
     width: 100%;
@@ -93,11 +79,13 @@ input:focus, select:focus {
     font-size: 1rem;
     font-weight: 600;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 .icon { width: 1.125rem; height: 1.125rem; }
 
-.btn-primary { background-color: var(--primary-color); color: white; width: 100%; }
+.btn-primary { background-color: var(--primary-color); color: white; }
 .btn-primary:hover { background-color: #4338ca; }
+#login-button { width: 100%; }
 .btn-danger { background-color: var(--danger-color); color: white; }
 .btn-danger:hover { background-color: #b91c1c; }
 .btn-secondary { background-color: #3f3f46; color: var(--text-primary); }
@@ -116,17 +104,17 @@ input:focus, select:focus {
 .header h1 { font-size: 1.75rem; margin: 0; }
 .clock { color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem; }
 
+/* --- PENATAAN ULANG KONTROL --- */
 .controls {
     max-width: none;
     margin-bottom: 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: 1fr auto;
     gap: 1rem;
+    align-items: flex-end;
 }
-.controls .input-group { margin-bottom: 0; flex-grow: 1; }
-.button-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.date-picker-group { grid-column: 1 / 2; }
+.button-group { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; height: 1.25rem; }
 .notification {
@@ -138,7 +126,6 @@ input:focus, select:focus {
     margin-bottom: 1rem;
 }
 
-/* --- TABS BARU UNTUK APEL --- */
 .session-tabs-nav {
     display: flex;
     background-color: var(--card-background);
@@ -160,10 +147,7 @@ input:focus, select:focus {
     transition: all 0.3s;
     white-space: nowrap;
 }
-.session-tab-link.active {
-    background-color: var(--primary-color);
-    color: white;
-}
+.session-tab-link.active { background-color: var(--primary-color); color: white; }
 
 .summary-card { max-width: none; margin-bottom: 1rem; }
 .summary-card h4 { margin-top: 0; text-align: center; color: var(--text-secondary); font-weight: 500;}
@@ -174,12 +158,7 @@ input:focus, select:focus {
 .summary-card hr { border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0; }
 .global-summary .summary-item strong { color: var(--primary-color); }
 
-.tabs-nav {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1rem;
-    overflow-x: auto;
-}
+.tabs-nav { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; overflow-x: auto; }
 .tab-link {
     padding: 1rem 1.5rem;
     cursor: pointer;
@@ -192,48 +171,94 @@ input:focus, select:focus {
     transition: all 0.2s;
     white-space: nowrap;
 }
-.tab-link.active, .tab-link:hover {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
+.tab-link.active, .tab-link:hover { color: var(--primary-color); border-bottom-color: var(--primary-color); }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; animation: fadeIn 0.5s; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.table-container { 
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    overflow-x: auto;
-}
+/* --- PENYESUAIAN RESPONSIVE UNTUK TABEL (DESKTOP FIRST) --- */
+.table-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
 thead th { background-color: #3f3f46; font-weight: 600; white-space: nowrap; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background-color: #3f3f46; }
 
-.prodi-summary {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+/* --- TOMBOL KETERANGAN BARU --- */
+.keterangan-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.btn-keterangan {
+    background-color: #3f3f46;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
 }
+.btn-keterangan:hover { background-color: #52525b; color: var(--text-primary); }
+
+.prodi-summary { margin-top: 1rem; padding: 1rem; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); }
 .prodi-summary h4 { margin-top: 0; color: var(--text-secondary); font-weight: 500; }
 .prodi-summary .summary-item { background: transparent; padding: 0; }
 
-/* --- TATA LETAK MOBILE --- */
+/* --- TATA LETAK MOBILE (BREAKPOINT 768px) --- */
 @media (max-width: 768px) {
     body { padding: 0.5rem; }
     .header h1 { font-size: 1.5rem; }
-    .btn-text { display: none; } /* Sembunyikan teks di tombol */
+    .btn-text { display: none; } /* Sembunyikan teks di tombol utama */
     .btn { padding: 0.75rem; }
-    .button-group { justify-content: space-around; }
-    .controls { align-items: stretch; }
-    .controls .input-group { min-width: 100%; }
+    
+    /* Kontrol menjadi 1 kolom */
+    .controls { grid-template-columns: 1fr; }
+    .date-picker-group { grid-column: 1 / -1; }
+    .button-group { grid-column: 1 / -1; justify-content: space-between; }
+    .button-group .btn { flex-grow: 1; }
+    
     .summary-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.5rem; }
     .summary-item strong { font-size: 1.25rem; }
     .tab-link { padding: 0.75rem 1rem; }
-    th, td { padding: 0.75rem; }
+    
+    /* --- LOGIKA TABEL RESPONSIVE --- */
+    thead { display: none; }
+    table, tbody, tr, td { display: block; width: 100%; }
+    
+    tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+    
+    td {
+        padding: 0.5rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        border-bottom: 1px solid var(--border-color);
+    }
+    tbody tr td:last-child { border-bottom: none; }
+
+    td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-align: left;
+        padding-right: 1rem;
+    }
+
+    td[data-label="Nama"] { font-weight: 600; font-size: 1.1rem; justify-content: flex-start; padding-top: 0; }
+    td[data-label="Nama"]:before { display: none; }
+
+    td[data-label="No"] { display: none; } /* Sembunyikan nomor urut di mobile */
+
+    /* Atur lebar elemen input agar pas */
+    td select, td .keterangan-input { width: 60%; }
+    td .keterangan-buttons { width: 60%; justify-content: flex-end; }
+    td[data-label="Keterangan"] { flex-wrap: wrap; }
+    td[data-label="Keterangan"] .keterangan-input { width: 100%; margin-bottom: 0.5rem; }
+    td[data-label="Keterangan"] .keterangan-buttons { width: 100%; }
 }
 
