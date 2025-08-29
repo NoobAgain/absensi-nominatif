@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showApp() {
         loginContainer.style.display = 'none';
         appContainer.style.display = 'block';
-        feather.replace();
+        initializeFeatherIcons();
         updateClock();
         clockInterval = setInterval(updateClock, 1000);
         initApp();
@@ -70,8 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         populateSessionTabs();
         populateProdiTabsAndTables();
+        addEventListeners(); // Menggabungkan semua event listener
         loadAttendanceData();
+    }
 
+    // --- FUNGSI EVENT LISTENER TERPUSAT ---
+    function addEventListeners() {
         datePicker.addEventListener('change', loadAttendanceData);
         resetButton.addEventListener('click', resetAttendance);
         saveButton.addEventListener('click', saveAttendanceData);
@@ -139,14 +143,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const originalIndex = personnelData.findIndex(p => p.nama === person.nama && p.prodi === person.prodi);
                                 return `
                                 <tr>
-                                    <td>${personIndex + 1}</td>
-                                    <td>${person.nama}</td>
-                                    <td>
+                                    <td data-label="No">${personIndex + 1}</td>
+                                    <td data-label="Nama">${person.nama}</td>
+                                    <td data-label="Status">
                                         <select class="status-select" data-index="${originalIndex}">
-                                            <option value="hadir">Hadir</option><option value="dd">DD</option><option value="sakit">Sakit</option><option value="izin">Izin</option><option value="alpa">Alpa</option>
+                                            <option value="hadir">Hadir</option>
+                                            <option value="dd">DD</option>
+                                            <option value="sakit">Sakit</option>
+                                            <option value="izin">Izin</option>
+                                            <option value="piketRusun">Piket Rusun</option>
+                                            <option value="piketKelas">Piket Kelas</option>
+                                            <option value="lokananta">Lokananta</option>
+                                            <option value="alpa">Alpa</option>
                                         </select>
                                     </td>
-                                    <td><input type="text" class="keterangan-input" placeholder="Isi jika perlu..." data-index="${originalIndex}"></td>
+                                    <td data-label="Keterangan">
+                                        <input type="text" class="keterangan-input" placeholder="Isi jika perlu..." data-index="${originalIndex}">
+                                    </td>
                                 </tr>`;
                             }).join('')}
                         </tbody>
@@ -180,16 +193,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return acc;
         }, {});
 
-        let totals = { hadir: 0, dd: 0, sakit: 0, izin: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
+        let totals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
         
         for (let i = 0; i < personnelData.length; i++) {
             const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
             if (totals[status] !== undefined) totals[status]++;
-            
-            const keterangan = document.querySelector(`.keterangan-input[data-index="${i}"]`).value.toLowerCase();
-            if (keterangan.includes('piket rusun')) totals.piketRusun++;
-            if (keterangan.includes('piket kelas')) totals.piketKelas++;
-            if (keterangan.includes('lokananta')) totals.lokananta++;
         }
 
         const kurang = personnelData.length - totals.hadir;
@@ -211,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
         Object.keys(groupedByProdi).forEach(prodi => {
-            let prodiTotals = { hadir: 0, dd: 0, sakit: 0, izin: 0 };
+            let prodiTotals = { hadir: 0, dd: 0, sakit: 0, izin: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
             const prodiPersonnel = groupedByProdi[prodi];
             
             prodiPersonnel.forEach(person => {
@@ -222,14 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const prodiSummaryContainer = document.getElementById(`summary-${prodi}`);
             if (prodiSummaryContainer) {
+                const prodiKurang = prodiPersonnel.length - prodiTotals.hadir;
                 prodiSummaryContainer.innerHTML = `
                     <h4>Rekap ${prodi}</h4>
                     <div class="summary-grid">
                         <div class="summary-item"><span>Total</span><strong>${prodiPersonnel.length}</strong></div>
                         <div class="summary-item"><span>Hadir</span><strong>${prodiTotals.hadir}</strong></div>
-                        <div class="summary-item"><span>DD</span><strong>${prodiTotals.dd}</strong></div>
-                        <div class="summary-item"><span>Sakit</span><strong>${prodiTotals.sakit}</strong></div>
-                        <div class="summary-item"><span>Izin</span><strong>${prodiTotals.izin}</strong></div>
+                        <div class="summary-item"><span>Kurang</span><strong>${prodiKurang}</strong></div>
                     </div>`;
             }
         });
@@ -276,44 +283,36 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Fungsi Ekspor ---
     function exportToExcel() {
-        // 1. Kalkulasi nilai rekapitulasi
         let totals = { hadir: 0, dd: 0, sakit: 0, izin: 0, alpa: 0, piketRusun: 0, piketKelas: 0, lokananta: 0 };
         for (let i = 0; i < personnelData.length; i++) {
             const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
             if (totals[status] !== undefined) totals[status]++;
-            
-            const keterangan = document.querySelector(`.keterangan-input[data-index="${i}"]`).value.toLowerCase();
-            if (keterangan.includes('piket rusun')) totals.piketRusun++;
-            if (keterangan.includes('piket kelas')) totals.piketKelas++;
-            if (keterangan.includes('lokananta')) totals.lokananta++;
         }
         const kurang = personnelData.length - totals.hadir;
 
-        // 2. Buat string rekapitulasi untuk CSV
         let summaryCsv = `REKAPITULASI ${SESSIONS[activeSession].toUpperCase()} - ${datePicker.value}\r\n\r\n`;
         summaryCsv += `Jumlah,"${personnelData.length}"\r\n`;
         summaryCsv += `Hadir,"${totals.hadir}"\r\n`;
         summaryCsv += `Kurang,"${kurang}"\r\n`;
         summaryCsv += `DD,"${totals.dd}"\r\n`;
         summaryCsv += `Sakit,"${totals.sakit}"\r\n`;
-        summaryCsv += `Izin,"${totals.izin}"\r\n\r\n`;
+        summaryCsv += `Izin,"${totals.izin}"\r\n`;
         summaryCsv += `Piket Rusun,"${totals.piketRusun}"\r\n`;
         summaryCsv += `Piket Kelas,"${totals.piketKelas}"\r\n`;
         summaryCsv += `Lokananta,"${totals.lokananta}"\r\n\r\n\r\n`;
 
-        // 3. Gabungkan rekapitulasi dengan data tabel
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += summaryCsv;
         csvContent += "No,Nama,Prodi,Status,Keterangan\r\n";
         
         personnelData.forEach((person, index) => {
-            const status = document.querySelector(`.status-select[data-index="${index}"]`).value.toUpperCase();
+            const statusSelect = document.querySelector(`.status-select[data-index="${index}"]`);
+            const status = statusSelect.options[statusSelect.selectedIndex].text; // Ambil teks status
             let keterangan = document.querySelector(`.keterangan-input[data-index="${index}"]`).value.replace(/"/g, '""');
             if (keterangan.includes(",")) keterangan = `"${keterangan}"`;
             csvContent += `${index + 1},${person.nama},${person.prodi},${status},${keterangan}\r\n`;
         });
 
-        // 4. Buat dan picu link unduhan
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         const sessionName = SESSIONS[activeSession].replace(/\s+/g, '-');
