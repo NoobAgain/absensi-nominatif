@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Nominatif TK3</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+    <div id="login-container" class="container">
+        <div class="card">
+            <h2 class="card-title">Login Akses</h2>
+            <p class="card-subtitle">Silakan masuk untuk mengelola absensi.</p>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Masukkan username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Masukkan password">
+            </div>
+            <button id="login-button" class="btn btn-primary">Login</button>
+            <p id="login-error" class="error-message"></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display: none;">
+        <div class="header">
+            <h1>Absensi Nominatif TK3</h1>
+            <button id="logout-button" class="btn btn-danger">
+                <i data-feather="log-out" class="icon"></i> Logout
+            </button>
+        </div>
+        <div class="controls card">
+            <div class="input-group">
+                <label for="date-picker">Pilih Tanggal Absensi</label>
+                <input type="date" id="date-picker">
+            </div>
+            <div class="button-group">
+                <button id="save-button" class="btn btn-primary"><i data-feather="save" class="icon"></i> Simpan</button>
+                <button id="reset-button" class="btn btn-secondary"><i data-feather="refresh-cw" class="icon"></i> Reset</button>
+            </div>
+        </div>
+        <p id="save-notification" class="notification" style="display: none;"></p>
+        
+        <div id="summary-container" class="card summary-card">
+            <!-- Konten rekapitulasi KESELURUHAN akan diisi oleh JavaScript -->
+        </div>
+
+        <div class="tabs-container">
+            <div id="tabs-nav" class="tabs-nav">
+                <!-- Navigasi Tab akan diisi oleh JavaScript -->
+            </div>
+            <div id="tabs-content">
+                <!-- Konten Tab (Tabel & Rekap per Prodi) akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+      // Inisialisasi Feather Icons setelah elemen dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        feather.replace();
+    });
+    </script>
+</body>
+</html>
+
