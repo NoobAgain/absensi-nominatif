@@ -18,6 +18,7 @@ body {
     margin: 0;
     padding: 1rem;
     color: var(--text-primary);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -108,13 +109,14 @@ input:focus, select:focus {
 .controls {
     max-width: none;
     margin-bottom: 1rem;
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     align-items: flex-end;
+    justify-content: space-between;
 }
-.date-picker-group { grid-column: 1 / 2; }
-.button-group { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.date-picker-group { flex: 1 1 250px; }
+.button-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; height: 1.25rem; }
 .notification {
@@ -184,20 +186,6 @@ thead th { background-color: #3f3f46; font-weight: 600; white-space: nowrap; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background-color: #3f3f46; }
 
-/* --- TOMBOL KETERANGAN BARU --- */
-.keterangan-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-.btn-keterangan {
-    background-color: #3f3f46;
-    color: var(--text-secondary);
-    border: none;
-    border-radius: 6px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.btn-keterangan:hover { background-color: #52525b; color: var(--text-primary); }
-
 .prodi-summary { margin-top: 1rem; padding: 1rem; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); }
 .prodi-summary h4 { margin-top: 0; color: var(--text-secondary); font-weight: 500; }
 .prodi-summary .summary-item { background: transparent; padding: 0; }
@@ -209,17 +197,11 @@ tbody tr:hover { background-color: #3f3f46; }
     .btn-text { display: none; } /* Sembunyikan teks di tombol utama */
     .btn { padding: 0.75rem; }
     
-    /* Kontrol menjadi 1 kolom */
-    .controls { grid-template-columns: 1fr; }
-    .date-picker-group { grid-column: 1 / -1; }
-    .button-group { grid-column: 1 / -1; justify-content: space-between; }
-    .button-group .btn { flex-grow: 1; }
-    
     .summary-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.5rem; }
     .summary-item strong { font-size: 1.25rem; }
     .tab-link { padding: 0.75rem 1rem; }
     
-    /* --- LOGIKA TABEL RESPONSIVE --- */
+    /* --- LOGIKA TABEL RESPONSIVE BARU --- */
     thead { display: none; }
     table, tbody, tr, td { display: block; width: 100%; }
     
@@ -232,33 +214,37 @@ tbody tr:hover { background-color: #3f3f46; }
     }
     
     td {
-        padding: 0.5rem 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: right;
-        border-bottom: 1px solid var(--border-color);
+        padding: 0;
+        display: block;
+        text-align: left;
+        border-bottom: none;
     }
-    tbody tr td:last-child { border-bottom: none; }
+    
+    td[data-label="Nama"] { 
+        font-weight: 600; 
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
 
+    td[data-label="Status"], td[data-label="Keterangan"] {
+        padding-top: 0.5rem;
+    }
+
+    /* Tampilkan label di atas input untuk mobile */
     td:before {
         content: attr(data-label);
-        font-weight: 600;
+        font-weight: 500;
         color: var(--text-secondary);
-        text-align: left;
-        padding-right: 1rem;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
     }
-
-    td[data-label="Nama"] { font-weight: 600; font-size: 1.1rem; justify-content: flex-start; padding-top: 0; }
-    td[data-label="Nama"]:before { display: none; }
-
-    td[data-label="No"] { display: none; } /* Sembunyikan nomor urut di mobile */
-
-    /* Atur lebar elemen input agar pas */
-    td select, td .keterangan-input { width: 60%; }
-    td .keterangan-buttons { width: 60%; justify-content: flex-end; }
-    td[data-label="Keterangan"] { flex-wrap: wrap; }
-    td[data-label="Keterangan"] .keterangan-input { width: 100%; margin-bottom: 0.5rem; }
-    td[data-label="Keterangan"] .keterangan-buttons { width: 100%; }
+    
+    td[data-label="Nama"]:before, td[data-label="No"]:before { 
+        display: none; 
+    }
+    td[data-label="No"] { 
+        display: none; 
+    }
 }
 
