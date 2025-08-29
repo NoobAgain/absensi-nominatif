@@ -39,8 +39,10 @@
                 <span class="btn-text">Logout</span>
             </button>
         </div>
+
+        <!-- KONTROL DIRAPIKAN -->
         <div class="controls card">
-            <div class="input-group">
+            <div class="input-group date-picker-group">
                 <label for="date-picker">Pilih Tanggal Absensi</label>
                 <input type="date" id="date-picker">
             </div>
@@ -52,7 +54,6 @@
         </div>
         <p id="save-notification" class="notification" style="display: none;"></p>
         
-        <!-- NAVIGASI UTAMA BARU UNTUK APEL -->
         <div id="session-tabs-nav" class="session-tabs-nav"></div>
 
         <div id="main-content">
@@ -74,9 +75,11 @@
     <script src="data.js"></script>
     <script src="script.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        feather.replace();
-    });
+      // Inisialisasi Feather Icons
+      function initializeFeatherIcons() {
+          feather.replace();
+      }
+      document.addEventListener('DOMContentLoaded', initializeFeatherIcons);
     </script>
 </body>
 </html>
