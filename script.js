@@ -1,254 +1,239 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Definisi elemen-elemen dari HTML
-    const loginContainer = document.getElementById('login-container');
-    const appContainer = document.getElementById('app-container');
-    const loginButton = document.getElementById('login-button');
-    const logoutButton = document.getElementById('logout-button');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const loginError = document.getElementById('login-error');
-    const datePicker = document.getElementById('date-picker');
-    const resetButton = document.getElementById('reset-button');
-    const saveButton = document.getElementById('save-button');
-    const saveNotification = document.getElementById('save-notification');
-    const summaryContainer = document.getElementById('summary-container');
-    const tabsNav = document.getElementById('tabs-nav');
-    const tabsContent = document.getElementById('tabs-content');
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #71717a;
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+    --background-color: #18181b;
+    --card-background: #27272a;
+    --border-color: #3f3f46;
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --font-family: 'Inter', sans-serif;
+    --border-radius: 12px;
+}
 
-    // --- Logika Login Sederhana ---
-    const validUsername = 'admin';
-    const validPassword = 'password';
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 1rem;
+    color: var(--text-primary);
+}
 
-    if (localStorage.getItem('isLoggedIn') === 'true') showApp();
-    else showLogin();
-    
-    function showLogin() {
-        loginContainer.style.display = 'flex';
-        appContainer.style.display = 'none';
-    }
-    
-    function showApp() {
-        loginContainer.style.display = 'none';
-        appContainer.style.display = 'block';
-        feather.replace(); // Re-initialize icons
-        initApp();
-    }
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+}
 
-    loginButton.addEventListener('click', () => {
-        if (usernameInput.value === validUsername && passwordInput.value === validPassword) {
-            localStorage.setItem('isLoggedIn', 'true');
-            showApp();
-        } else {
-            loginError.textContent = 'Username atau password salah.';
-        }
-    });
-    
-    logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('isLoggedIn');
-        showLogin();
-    });
+.card {
+    background-color: var(--card-background);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 400px;
+}
 
-    function initApp() {
-        const today = new Date().toISOString().split('T')[0];
-        datePicker.value = today;
-        
-        populateTabsAndTables();
-        loadAttendanceData();
+#app-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}
 
-        datePicker.addEventListener('change', loadAttendanceData);
-        resetButton.addEventListener('click', resetAttendance);
-        saveButton.addEventListener('click', saveAttendanceData);
-    }
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+.card-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
 
-    function populateTabsAndTables() {
-        const groupedByProdi = personnelData.reduce((acc, person) => {
-            (acc[person.prodi] = acc[person.prodi] || []).push(person);
-            return acc;
-        }, {});
+.input-group { margin-bottom: 1rem; }
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
 
-        tabsNav.innerHTML = '';
-        tabsContent.innerHTML = '';
+input[type="text"], input[type="password"], input[type="date"], select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5);
+}
 
-        Object.keys(groupedByProdi).forEach((prodi, index) => {
-            const isActive = index === 0 ? 'active' : '';
-            
-            // Buat tombol navigasi tab
-            const tabButton = document.createElement('button');
-            tabButton.className = `tab-link ${isActive}`;
-            tabButton.textContent = prodi;
-            tabButton.setAttribute('data-tab', prodi);
-            tabsNav.appendChild(tabButton);
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.icon { width: 1.125rem; height: 1.125rem; }
 
-            // Buat konten tab (div yang berisi tabel dan rekap prodi)
-            const tabPane = document.createElement('div');
-            tabPane.id = prodi;
-            tabPane.className = `tab-pane ${isActive}`;
-            
-            const tableHTML = `
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Status</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${groupedByProdi[prodi].map((person, personIndex) => {
-                                const originalIndex = personnelData.findIndex(p => p.nama === person.nama && p.prodi === person.prodi);
-                                return `
-                                <tr>
-                                    <td>${personIndex + 1}</td>
-                                    <td>${person.nama}</td>
-                                    <td>
-                                        <select class="status-select" data-index="${originalIndex}">
-                                            <option value="hadir">Hadir</option>
-                                            <option value="dd">DD</option>
-                                            <option value="sakit">Sakit</option>
-                                            <option value="izin">Izin</option>
-                                            <option value="alpa">Alpa</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="keterangan-input" placeholder="Isi jika perlu..." data-index="${originalIndex}"></td>
-                                </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-            
-            const prodiSummaryHTML = `<div id="summary-${prodi}" class="prodi-summary"></div>`;
-            tabPane.innerHTML = tableHTML + prodiSummaryHTML;
-            tabsContent.appendChild(tabPane);
-        });
-        
-        document.querySelectorAll('.tab-link').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-link, .tab-pane').forEach(el => el.classList.remove('active'));
-                const tabId = button.getAttribute('data-tab');
-                button.classList.add('active');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
+.btn-primary { background-color: var(--primary-color); color: white; width: 100%; }
+.btn-primary:hover { background-color: #4338ca; }
+.btn-danger { background-color: var(--danger-color); color: white; }
+.btn-danger:hover { background-color: #b91c1c; }
+.btn-secondary { background-color: #3f3f46; color: var(--text-primary); }
+.btn-secondary:hover { background-color: #52525b; }
+.btn-success { background-color: var(--success-color); color: white; }
+.btn-success:hover { background-color: #15803d; }
 
-        document.querySelectorAll('.status-select, .keterangan-input').forEach(el => {
-            el.addEventListener('change', updateAllSummaries);
-            el.addEventListener('keyup', updateAllSummaries);
-        });
-    }
-    
-    function updateAllSummaries() {
-        const groupedByProdi = personnelData.reduce((acc, person) => {
-            (acc[person.prodi] = acc[person.prodi] || []).push(person);
-            return acc;
-        }, {});
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.header h1 { font-size: 1.75rem; margin: 0; }
+.clock { color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem; }
 
-        // Kalkulasi Global
-        let total = personnelData.length, hadir = 0, dd = 0, sakit = 0, izin = 0;
-        let piketRusun = 0, piketKelas = 0, lokananta = 0;
-        
-        for(let i=0; i < personnelData.length; i++) {
-            const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
-            if (status === 'hadir') hadir++;
-            if (status === 'dd') dd++;
-            if (status === 'sakit') sakit++;
-            if (status === 'izin') izin++;
-            
-            const keterangan = document.querySelector(`.keterangan-input[data-index="${i}"]`).value.toLowerCase();
-            if (keterangan.includes('piket rusun')) piketRusun++;
-            if (keterangan.includes('piket kelas')) piketKelas++;
-            if (keterangan.includes('lokananta')) lokananta++;
-        }
+.controls {
+    max-width: none;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.controls .input-group { margin-bottom: 0; flex-grow: 1; }
+.button-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
-        const kurang = total - hadir;
+.error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; height: 1.25rem; }
+.notification {
+    padding: 1rem;
+    background-color: var(--success-color);
+    color: white;
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-bottom: 1rem;
+}
 
-        summaryContainer.innerHTML = `
-            <h4>Rekapitulasi Keseluruhan</h4>
-            <div class="summary-grid global-summary">
-                <div class="summary-item"><span>Jumlah</span><strong>${total}</strong></div>
-                <div class="summary-item"><span>Hadir</span><strong>${hadir}</strong></div>
-                <div class="summary-item"><span>Kurang</span><strong>${kurang}</strong></div>
-                <div class="summary-item"><span>DD</span><strong>${dd}</strong></div>
-                <div class="summary-item"><span>Sakit</span><strong>${sakit}</strong></div>
-                <div class="summary-item"><span>Izin</span><strong>${izin}</strong></div>
-            </div>
-            <hr>
-            <div class="summary-grid global-summary">
-                <div class="summary-item"><span>Piket Rusun</span><strong>${piketRusun}</strong></div>
-                <div class="summary-item"><span>Piket Kelas</span><strong>${piketKelas}</strong></div>
-                <div class="summary-item"><span>Lokananta</span><strong>${lokananta}</strong></div>
-            </div>`;
+/* --- TABS BARU UNTUK APEL --- */
+.session-tabs-nav {
+    display: flex;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+.session-tab-link {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+.session-tab-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
 
-        // Kalkulasi per Prodi
-        Object.keys(groupedByProdi).forEach(prodi => {
-            let prodiHadir = 0, prodiDD = 0, prodiSakit = 0, prodiIzin = 0;
-            const prodiPersonnel = groupedByProdi[prodi];
-            
-            prodiPersonnel.forEach(person => {
-                const originalIndex = personnelData.findIndex(p => p.nama === person.nama);
-                const status = document.querySelector(`.status-select[data-index="${originalIndex}"]`).value;
-                if (status === 'hadir') prodiHadir++;
-                if (status === 'dd') prodiDD++;
-                if (status === 'sakit') prodiSakit++;
-                if (status === 'izin') prodiIzin++;
-            });
-            
-            const prodiSummaryContainer = document.getElementById(`summary-${prodi}`);
-            prodiSummaryContainer.innerHTML = `
-                <h4>Rekap ${prodi}</h4>
-                <div class="summary-grid">
-                    <div class="summary-item"><span>Total</span><strong>${prodiPersonnel.length}</strong></div>
-                    <div class="summary-item"><span>Hadir</span><strong>${prodiHadir}</strong></div>
-                    <div class="summary-item"><span>DD</span><strong>${prodiDD}</strong></div>
-                    <div class="summary-item"><span>Sakit</span><strong>${prodiSakit}</strong></div>
-                    <div class="summary-item"><span>Izin</span><strong>${prodiIzin}</strong></div>
-                </div>`;
-        });
-    }
+.summary-card { max-width: none; margin-bottom: 1rem; }
+.summary-card h4 { margin-top: 0; text-align: center; color: var(--text-secondary); font-weight: 500;}
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 1rem; }
+.summary-item { text-align: center; background: var(--background-color); padding: 1rem; border-radius: var(--border-radius);}
+.summary-item span { font-size: 0.875rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem; }
+.summary-item strong { font-size: 1.5rem; color: var(--text-primary); }
+.summary-card hr { border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0; }
+.global-summary .summary-item strong { color: var(--primary-color); }
 
-    function saveAttendanceData() {
-        const date = datePicker.value;
-        const attendanceData = [];
-        
-        for(let i=0; i < personnelData.length; i++) {
-            const status = document.querySelector(`.status-select[data-index="${i}"]`).value;
-            const keterangan = document.querySelector(`.keterangan-input[data-index="${i}"]`).value;
-            attendanceData.push({ status, keterangan });
-        }
+.tabs-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+.tab-link {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.tab-link.active, .tab-link:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeIn 0.5s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        localStorage.setItem(`attendance_${date}`, JSON.stringify(attendanceData));
-        
-        saveNotification.textContent = 'Data absensi untuk ' + date + ' berhasil disimpan!';
-        saveNotification.style.display = 'block';
-        setTimeout(() => saveNotification.style.display = 'none', 3000);
-    }
+.table-container { 
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+thead th { background-color: #3f3f46; font-weight: 600; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background-color: #3f3f46; }
 
-    function loadAttendanceData() {
-        const date = datePicker.value;
-        const savedData = localStorage.getItem(`attendance_${date}`);
-        
-        if (savedData) {
-            const attendanceData = JSON.parse(savedData);
-            if(attendanceData.length === personnelData.length) {
-                for(let i=0; i < personnelData.length; i++) {
-                    document.querySelector(`.status-select[data-index="${i}"]`).value = attendanceData[i].status;
-                    document.querySelector(`.keterangan-input[data-index="${i}"]`).value = attendanceData[i].keterangan;
-                }
-            } else {
-                resetAttendance();
-            }
-        } else {
-            resetAttendance();
-        }
-        updateAllSummaries();
-    }
+.prodi-summary {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+.prodi-summary h4 { margin-top: 0; color: var(--text-secondary); font-weight: 500; }
+.prodi-summary .summary-item { background: transparent; padding: 0; }
 
-    function resetAttendance() {
-        document.querySelectorAll('.status-select').forEach(select => select.value = 'hadir');
-        document.querySelectorAll('.keterangan-input').forEach(input => input.value = '');
-        updateAllSummaries();
-    }
-});
+/* --- TATA LETAK MOBILE --- */
+@media (max-width: 768px) {
+    body { padding: 0.5rem; }
+    .header h1 { font-size: 1.5rem; }
+    .btn-text { display: none; } /* Sembunyikan teks di tombol */
+    .btn { padding: 0.75rem; }
+    .button-group { justify-content: space-around; }
+    .controls { align-items: stretch; }
+    .controls .input-group { min-width: 100%; }
+    .summary-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.5rem; }
+    .summary-item strong { font-size: 1.25rem; }
+    .tab-link { padding: 0.75rem 1rem; }
+    th, td { padding: 0.75rem; }
+}
 
